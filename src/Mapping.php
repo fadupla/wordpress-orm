@@ -206,7 +206,7 @@ class Mapping {
    *
    * @throws \Symlink\ORM\Exceptions\AllowSchemaUpdateIsFalseException
    */
-  public function updateSchema($classname) {
+  public function updateSchema($classname):array {
     global $wpdb;
 
     // Get the model annotation data.
@@ -218,8 +218,9 @@ class Mapping {
     }
 
     // Create an ID type string.
-    $id_type        = 'ID';
-    $id_type_string = 'ID bigint(20) NOT NULL AUTO_INCREMENT';
+	  $primary_key_name = ( new $classname )->getPrimaryKeyName();
+    $id_type        = $primary_key_name;
+    $id_type_string = $primary_key_name.' bigint(20) NOT NULL AUTO_INCREMENT';
 
     // Build the SQL CREATE TABLE command for use with dbDelta.
     $table_name = $wpdb->prefix . $mapped['ORM_Table'];
@@ -234,7 +235,8 @@ class Mapping {
 
     // Use dbDelta to do all the hard work.
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
+
+    return dbDelta($sql);
   }
 
   public function dropTable($classname) {

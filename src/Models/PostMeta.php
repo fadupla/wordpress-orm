@@ -10,7 +10,7 @@ use Symlink\ORM\Models\BaseModel as Model;
  * @ORM_Table "postmeta"
  * @ORM_AllowSchemaUpdate False
  */
-class Posts extends Model {
+class PostMeta extends Model {
 
   /**
    * @ORM_Column_Type bigint

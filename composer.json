@@ -1,14 +1,18 @@
 {
-  "name": "rjjakes/wordpress-orm",
+  "name": "fadupla/wordpress-orm",
   "description": "WORM. Doctrine style ORM for Wordpress.",
   "keywords": ["wordpress", "plugin", "orm", "doctrine", "composer", "sql"],
-  "homepage": "https://github.com/rjjakes/wordpress-orm",
+  "homepage": "https://github.com/fadupla/wordpress-orm",
   "require": {
     "php": ">=5.5",
     "minime/annotations": "^3.1"
   },
   "license": "MIT",
   "authors": [
+    {
+      "name": "Fa Dupla",
+      "email": "fadupla@gmail.com"
+    },
     {
       "name": "Ray Jakes",
       "email": "symlinkdigital@gmail.com"
