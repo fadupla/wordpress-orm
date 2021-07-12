@@ -45,7 +45,7 @@ abstract class BaseModel {
 	}
 
 	/**
-	 * Getter.
+	 * Get Primary key name
 	 *
 	 * @return string
 	 */
@@ -54,7 +54,7 @@ abstract class BaseModel {
 	}
 
 	/**
-	 * Getter.
+	 * Get ID (Primary key)
 	 *
 	 * @return string
 	 */
@@ -63,7 +63,18 @@ abstract class BaseModel {
 	}
 
 	/**
-	 * @return mixed
+	 * Set ID
+	 *
+	 * @param int $id
+	 *
+	 * @return int
+	 */
+	public function setId( int $id ): int {
+		return $this->{$this->primary_key_name} = $id;
+	}
+
+	/**
+	 * @return string
 	 */
 	public function getHash() {
 		return $this->hash;
@@ -191,13 +202,19 @@ abstract class BaseModel {
 	 * @throws \Symlink\ORM\Exceptions\PropertyDoesNotExistException
 	 */
 	final public function set( $column, $value ) {
-		// Check to see if the property exists on the model.
-		if ( ! property_exists( $this, $column ) ) {
-			throw new \Symlink\ORM\Exceptions\PropertyDoesNotExistException( sprintf( __( 'The property %s does not exist on the model %s.' ), $column, get_class( $this ) ) );
-		}
 
-		// Update the model with the value.
-		$this->$column = $value;
+		// Specific to ID (Primary key)
+		if ( $column === $this->primary_key_name ) {
+			$this->setId( $value );
+		} else {
+			// Check to see if the property exists on the model.
+			if ( ! property_exists( $this, $column ) ) {
+				throw new \Symlink\ORM\Exceptions\PropertyDoesNotExistException( sprintf( __( 'The property %s does not exist on the model %s.' ), $column, get_class( $this ) ) );
+			}
+
+			// Update the model with the value.
+			$this->$column = $value;
+		}
 
 		return true;
 	}
