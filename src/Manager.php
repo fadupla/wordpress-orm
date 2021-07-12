@@ -214,9 +214,6 @@ class Manager {
 
 				$count = $wpdb->query( $prepared );
 
-				ppp( $prepared, '$prepared' );
-				var_dump( $count );
-
 				// Start tracking all the added objects.
 				if ( $count !== false ) {
 					array_walk( $values['objects'], function ( $object ) {
