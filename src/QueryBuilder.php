@@ -183,7 +183,7 @@ class QueryBuilder {
 		}
 
 		// Save it.
-		$this->query = $wpdb->prepare( $sql, $values );
+		$this->query = count( $this->where ) ? $wpdb->prepare( $sql, $values ) : $sql;
 
 		return $this;
 	}
