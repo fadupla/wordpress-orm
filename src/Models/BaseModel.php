@@ -17,7 +17,7 @@ abstract class BaseModel {
 	 * Default Primary Key Name (ID)
 	 * @var string
 	 */
-	protected $primary_key_name = 'ID';
+	public $primary_key_name = 'ID';
 
 	/**
 	 * @var

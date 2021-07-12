@@ -12,7 +12,7 @@ use Symlink\ORM\Models\BaseModel as Model;
  */
 class PostMeta extends Model {
 
-	protected $primary_key_name = 'meta_id';
+	public $primary_key_name = 'meta_id';
 
 	/**
 	 * @ORM_Column_Type bigint
