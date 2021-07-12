@@ -178,26 +178,30 @@ class Manager {
 			// Build the combined query for table: $tablename
 			foreach ( $update as $classname => $values ) {
 
+				// Primary key name
+				$primary_key_name = ( new $classname )->getPrimaryKeyName();
+
+				// Table name
 				$table_name = $wpdb->prefix . $values['table_name'];
 
-				$sql = "INSERT INTO " . $table_name . " (ID, " . implode( ", ", $values['columns'] ) . ")
-          VALUES
-          ";
+				$sql = "INSERT INTO " . $table_name . " (" . $primary_key_name . ", " . implode( ", ", $values['columns'] ) . ")
+    VALUES
+      ";
 
 				while ( $values['placeholders_count'] > 0 ) {
 					$sql .= "(%d, " . implode( ", ", $values['placeholders'] ) . ")";
 
 					if ( $values['placeholders_count'] > 1 ) {
 						$sql .= ",
-            ";
+      ";
 					}
 
 					$values['placeholders_count'] -= 1;
 				}
 
 				$sql .= "
-        ON DUPLICATE KEY UPDATE
-        ";
+    ON DUPLICATE KEY UPDATE
+      ";
 
 				$update_set = [];
 				foreach ( $values['columns'] as $column ) {
@@ -210,8 +214,11 @@ class Manager {
 
 				$count = $wpdb->query( $prepared );
 
+				ppp( $prepared, '$prepared' );
+				var_dump( $count );
+
 				// Start tracking all the added objects.
-				if ( $count ) {
+				if ( $count !== false ) {
 					array_walk( $values['objects'], function ( $object ) {
 						$this->track( $object );
 					} );
@@ -238,10 +245,14 @@ class Manager {
 			// Build the combined query for table: $tablename
 			foreach ( $update as $classname => $values ) {
 
+				// Primary key name
+				$primary_key_name = ( new $classname )->getPrimaryKeyName();
+
+				// Table name
 				$table_name = $wpdb->prefix . $values['table_name'];
 
 				// Build the SQL.
-				$sql = "DELETE FROM " . $table_name . " WHERE ID IN (" . implode( ", ", array_fill( 0, count( $values['values'] ), "%d" ) ) . ");";
+				$sql = "DELETE FROM " . $table_name . " WHERE " . $primary_key_name . " IN (" . implode( ", ", array_fill( 0, count( $values['values'] ), "%d" ) ) . ");";
 
 				// Process all deletes for a particular table together as a single query.
 				$prepared = $wpdb->prepare( $sql, $values['values'] );
