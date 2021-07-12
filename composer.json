@@ -4,7 +4,7 @@
   "keywords": ["wordpress", "plugin", "orm", "doctrine", "composer", "sql"],
   "homepage": "https://github.com/fadupla/wordpress-orm",
   "require": {
-    "php": ">=5.5",
+    "php": ">=7.4",
     "minime/annotations": "^3.1"
   },
   "license": "MIT",

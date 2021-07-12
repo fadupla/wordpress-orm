@@ -110,9 +110,8 @@ class Manager {
 	 * This will perform one query per table no matter how many records need to
 	 * be added.
 	 *
-	 * @throws \Symlink\ORM\Exceptions\FailedToInsertException
 	 */
-	private function _flush_insert() {
+	private function _flush_insert(): void {
 		global $wpdb;
 
 		// Get a list of tables and columns that have data to insert.
@@ -153,7 +152,7 @@ class Manager {
 					} );
 				} // Something went wrong.
 				else {
-					throw new \Symlink\ORM\Exceptions\FailedToInsertException( __( 'Failed to insert one or more records into the database.' ) );
+					$this->handle_error( sprintf( __( 'Failed to insert %s record(s) into the database.' ), count( $insert ) ) );
 				}
 			}
 		}
@@ -168,13 +167,13 @@ class Manager {
 	 * be updated.
 	 * https://stackoverflow.com/questions/3432/multiple-updates-in-mysql
 	 */
-	private function _flush_update() {
+	private function _flush_update(): void {
 		global $wpdb;
 
 		// Get a list of tables and columns that have data to update.
 		$update = $this->tracked->getInsertUpdateTableData( 'getChangedObjects' );
 
-		// Process the INSERTs
+		// Process the UPDATEs
 		if ( count( $update ) ) {
 			// Build the combined query for table: $tablename
 			foreach ( $update as $classname => $values ) {
@@ -218,9 +217,8 @@ class Manager {
 					} );
 				} // Something went wrong.
 				else {
-					throw new \Symlink\ORM\Exceptions\FailedToInsertException( __( 'Failed to update one or more records in the database.' ) );
+					$this->handle_error( sprintf( __( 'Failed to update %s record(s) into the database.' ), count( $update ) ) );
 				}
-
 			}
 		}
 	}
@@ -228,7 +226,7 @@ class Manager {
 	/**
 	 *
 	 */
-	private function _flush_delete() {
+	private function _flush_delete(): void {
 
 		global $wpdb;
 
@@ -261,13 +259,53 @@ class Manager {
 	/**
 	 * Apply changes to all models queued up with persist().
 	 * Attempts to combine queries to reduce MySQL load.
-	 *
-	 * @throws \Symlink\ORM\Exceptions\FailedToInsertException
 	 */
 	public function flush() {
 		$this->_flush_update();
 		$this->_flush_insert();
 		$this->_flush_delete();
+	}
+
+	/**
+	 * Handle the error and ouput it nicely in WordPress style
+	 *
+	 * @param string $fail_message
+	 */
+	private function handle_error( string $fail_message = '' ) {
+
+		global $wpdb;
+
+		// Default fail message
+		if ( $fail_message === '' ) {
+			$fail_message = __( 'WordPress database error' );
+		}
+
+		if ( $wpdb->last_error !== '' ) {
+
+			$e     = new \Exception();
+			$trace = $e->getTraceAsString();
+
+			$error_html = sprintf(
+				'<div id="error">
+							<h2 class="error-message"><span class="dashicons dashicons-dismiss"></span>%s</h2>
+							<p><strong>Last error:</strong></p>
+							<p>%s</p>
+							<p><strong>Last query:</strong></p>
+							<code>%s</code>
+							<p><strong>Call stack:</strong></p>
+							<pre>%s</pre>
+						</div>',
+				$fail_message,
+				htmlspecialchars( $wpdb->last_error, ENT_QUOTES ),
+				htmlspecialchars( $wpdb->last_query, ENT_QUOTES ),
+				$trace
+			);
+		} else {
+			$error_html = $fail_message;
+		}
+
+		wp_die( $error_html );
+
 	}
 
 }
