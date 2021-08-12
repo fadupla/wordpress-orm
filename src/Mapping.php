@@ -195,15 +195,20 @@ class Mapping {
 	}
 
 	/**
-	 * Compares a database table schema to the model schema (as defined in th
+	 * Compares a database table schema to the model schema (as defined in the
 	 * annotations). If there any differences, the database schema is modified to
 	 * match the model.
 	 *
-	 * @param $classname
+	 * @param string $classname
 	 *
-	 * @throws \Symlink\ORM\Exceptions\AllowSchemaUpdateIsFalseException
+	 * @return array
+	 *
+	 * @throws Exceptions\AllowSchemaUpdateIsFalseException
+	 * @throws Exceptions\RepositoryClassNotDefinedException
+	 * @throws Exceptions\RequiredAnnotationMissingException
+	 * @throws Exceptions\UnknownColumnTypeException
 	 */
-	public function updateSchema( $classname ): array {
+	public function updateSchema( string $classname ): array {
 		global $wpdb;
 
 		// Get the model annotation data.
@@ -224,11 +229,7 @@ class Mapping {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE " . $table_name . " (
-  " . $id_type_string . ",
-  " . implode( ",\n  ", $mapped['schema'] ) . ",
-  PRIMARY KEY  (" . $id_type . ")
-) $charset_collate;";
+		$sql = sprintf( "CREATE TABLE %s ( %s, %s, PRIMARY KEY (%s) ) %s;", $table_name, $id_type_string, implode( ",\n  ", $mapped['schema'] ), $id_type, $charset_collate );
 
 		// Use dbDelta to do all the hard work.
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -236,7 +237,20 @@ class Mapping {
 		return dbDelta( $sql );
 	}
 
-	public function dropTable( $classname ) {
+	/**
+	 * Drop a Model table
+	 *
+	 * @param string $classname
+	 *
+	 * @return int|bool Boolean true for CREATE, ALTER, TRUNCATE and DROP queries. Number of rows
+	 *                  affected/selected for all other queries. Boolean false on error.
+	 *
+	 * @throws Exceptions\RepositoryClassNotDefinedException
+	 * @throws Exceptions\RequiredAnnotationMissingException
+	 * @throws Exceptions\UnknownColumnTypeException
+	 * @throws Exceptions\AllowSchemaUpdateIsFalseException
+	 */
+	public function dropTable( string $classname ): int|bool {
 		global $wpdb;
 
 		// Get the model annotation data.
@@ -250,7 +264,8 @@ class Mapping {
 		// Drop the table.
 		$table_name = $wpdb->prefix . $mapped['ORM_Table'];
 		$sql        = "DROP TABLE IF EXISTS " . $table_name;
-		$wpdb->query( $sql );
+
+		return $wpdb->query( $sql );
 	}
 
 }
