@@ -193,7 +193,7 @@ class QueryBuilder {
 	 *
 	 * @param bool $always_array
 	 *
-	 * @return array|bool|mixed
+	 * @return array|mixed
 	 * @throws \Symlink\ORM\Exceptions\NoQueryException
 	 */
 	public function getResults( $always_array = false ) {
@@ -225,7 +225,7 @@ class QueryBuilder {
 
 			// There were no results.
 			if ( ! count( $objects ) ) {
-				return false;
+				return null;
 			}
 
 			// Return just an object if there was only one result.
