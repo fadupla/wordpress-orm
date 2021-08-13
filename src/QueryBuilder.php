@@ -66,7 +66,10 @@ class QueryBuilder {
 			'>=',
 			'IN',
 			'NOT IN',
-			'LIKE'
+			'LIKE',
+			'NOT LIKE',
+			'REGEXP',
+			'NOT REGEXP',
 		] )
 		) {
 			throw new \Symlink\ORM\Exceptions\InvalidOperatorException( sprintf( __( 'Operator %s is not valid.' ), $operator ) );
