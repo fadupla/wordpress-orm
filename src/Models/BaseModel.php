@@ -119,9 +119,22 @@ abstract class BaseModel {
 	 * @return bool
 	 */
 	public function getAllUnkeyedValues() {
-		return array_map( function ( $key ) {
-			return $this->get( $key );
+
+		$values = array_map( function ( $key ) {
+
+			$value = $this->get( $key );
+
+			// If this is an Object, get the primary key to save
+			// To avoid "Notice: wpdb::prepare was called incorrectly. Unsupported value type (object). Please see Debugging in WordPress for more information. (This message was added in version 4.8.2.) in /var/www/superteamseo.com/wp-includes/functions.php on line 5535"
+			if ( is_object( $value ) ) {
+				$value = $value->{$value->primary_key_name};
+			}
+
+			return $value;
 		}, array_keys( $this->getSchema() ) );
+
+
+		return $values;
 	}
 
 	/**

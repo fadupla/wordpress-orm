@@ -59,17 +59,12 @@ class TrackedCollection implements \ArrayAccess {
 			// Now add the placeholder and row data.
 			$data[ get_class( $item['model'] ) ]['placeholders_count'] += 1;
 
+			$values = $item['model']->getAllUnkeyedValues();
+			
 			if ( $iterator === 'getPersistedObjects' ) {
-				$data[ get_class( $item['model'] ) ]['values'] = array_merge(
-					$data[ get_class( $item['model'] ) ]['values'],
-					$item['model']->getAllUnkeyedValues()
-				);
+				$data[ get_class( $item['model'] ) ]['values'] = array_merge( $data[ get_class( $item['model'] ) ]['values'], $values );
 			} else {
-				$data[ get_class( $item['model'] ) ]['values'] = array_merge(
-					$data[ get_class( $item['model'] ) ]['values'],
-					[ $item['model']->getID() ],
-					$item['model']->getAllUnkeyedValues()
-				);
+				$data[ get_class( $item['model'] ) ]['values'] = array_merge( $data[ get_class( $item['model'] ) ]['values'], [ $item['model']->getID() ], $values );
 			}
 		}
 
