@@ -238,6 +238,37 @@ class Mapping {
 	}
 
 	/**
+	 * Truncate a Model table
+	 *
+	 * @param string $classname
+	 *
+	 * @return int|bool Boolean true for CREATE, ALTER, TRUNCATE and DROP queries. Number of rows
+	 *                  affected/selected for all other queries. Boolean false on error.
+	 *
+	 * @throws Exceptions\RepositoryClassNotDefinedException
+	 * @throws Exceptions\RequiredAnnotationMissingException
+	 * @throws Exceptions\UnknownColumnTypeException
+	 * @throws Exceptions\AllowSchemaUpdateIsFalseException
+	 */
+	public function truncateTable( string $classname ): int|bool {
+		global $wpdb;
+
+		// Get the model annotation data.
+		$mapped = $this->getProcessed( $classname );
+
+		// Are we allowed to update the schema of this model in the db?
+		if ( ! $mapped['ORM_AllowSchemaUpdate'] ) {
+			throw new \Symlink\ORM\Exceptions\AllowSchemaUpdateIsFalseException( sprintf( __( 'Refused to drop table for model %s. ORM_AllowSchemaUpdate is FALSE.' ), $classname ) );
+		}
+
+		// Drop the table.
+		$table_name = $wpdb->prefix . $mapped['ORM_Table'];
+		$sql        = "TRUNCATE " . $table_name;
+
+		return $wpdb->query( $sql );
+	}
+
+	/**
 	 * Drop a Model table
 	 *
 	 * @param string $classname
