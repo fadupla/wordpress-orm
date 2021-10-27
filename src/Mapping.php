@@ -229,7 +229,7 @@ class Mapping {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = sprintf( "CREATE TABLE %s ( %s, %s, PRIMARY KEY (%s) ) %s;", $table_name, $id_type_string, implode( ",\n  ", $mapped['schema'] ), $id_type, $charset_collate );
+		$sql = sprintf( "CREATE TABLE %s ( %s, %s,\nPRIMARY KEY (%s) )\n%s;", $table_name, $id_type_string, implode( ",\n  ", $mapped['schema'] ), $id_type, $charset_collate );
 
 		// Use dbDelta to do all the hard work.
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
