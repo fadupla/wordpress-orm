@@ -209,6 +209,24 @@ class QueryBuilder {
 			// Classname for this repository.
 			$object_classname = $this->repository->getObjectClass();
 
+			/**
+			 * Get in cache if exists or retrieve in DB and save in cache for later use in the current request
+			 */
+			// Cache group (Where the cache contents are grouped)
+			$cache_group = 'wordpress_orm_getResults';
+			// Cache key
+			$cache_key = md5( $this->query );
+
+			$results = wp_cache_get( $cache_key, $cache_group );
+			if ( $results === false ) {
+
+				// Get items
+				$results = $wpdb->get_results( $this->query );
+
+				// Cache result
+				wp_cache_add( $cache_key, $results, $cache_group );
+			}
+
 			// Loop through the database results, building the objects.
 			$objects = array_map( function ( $result ) use ( &$object_classname ) {
 
@@ -226,7 +244,7 @@ class QueryBuilder {
 
 				// Save it.
 				return $object;
-			}, $wpdb->get_results( $this->query ) );
+			}, $results );
 
 			// There were no results.
 			if ( ! count( $objects ) ) {
