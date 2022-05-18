@@ -143,6 +143,7 @@ class Mapping {
 						'smallint',
 						'int',
 						'bigint',
+						'char',
 						'varchar',
 						'tinytext',
 						'text',
