@@ -2,6 +2,7 @@
 
 namespace Symlink\ORM;
 
+use Minime\Annotations\Interfaces\AnnotationsBagInterface;
 use Minime\Annotations\Reader;
 use Minime\Annotations\AnnotationsBag;
 
@@ -67,8 +68,9 @@ class Mapping {
 	/**
 	 * @param $classname
 	 * @param $property
+	 * @param $key
 	 *
-	 * @return \Minime\Annotations\Interfaces\AnnotationsBagInterface
+	 * @return AnnotationsBagInterface
 	 */
 	public function getPropertyAnnotationValue( $classname, $property, $key ) {
 		// Get the annotations.
@@ -193,8 +195,16 @@ class Mapping {
 						$placeholder_values_type = '%f';
 					}
 
+					// Add the comment for this class
+					$comment = trim( $property_annotation->get( 'ORM_Comment' ) );
+					$comment = str_replace( [ "'", '"' ], '', $comment );
+					if ( $comment ) {
+						$schema_string .= " COMMENT '" . $comment . "'";
+					}
+
 					$this->models[ $classname ]['schema'][ $property->name ]      = $schema_string;
 					$this->models[ $classname ]['placeholder'][ $property->name ] = $placeholder_values_type;
+
 				}
 
 				/**
@@ -288,7 +298,7 @@ class Mapping {
 	 * Add indexes of model. Indexes can be reset on an update for example
 	 *
 	 * @param string $classname
-	 * @param bool $reset_indexes
+	 * @param bool   $reset_indexes
 	 *
 	 * @return array
 	 * @throws Exceptions\AllowSchemaUpdateIsFalseException
